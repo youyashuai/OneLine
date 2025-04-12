@@ -340,10 +340,10 @@ function MainContent() {
                 <SelectValue placeholder="筛选时间" />
               </SelectTrigger>
               <SelectContent className="backdrop-blur-md bg-background/80 border border-border/50 rounded-lg">
-                <SelectItem value="all">不限时间</SelectItem>
                 <SelectItem value="month">一个月内</SelectItem>
                 <SelectItem value="halfYear">半年内</SelectItem>
                 <SelectItem value="year">一年内</SelectItem>
+                <SelectItem value="all">不限时间</SelectItem>
                 <SelectItem value="custom">自定义</SelectItem>
               </SelectContent>
             </Select>
