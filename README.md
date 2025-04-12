@@ -38,8 +38,39 @@ npm run build
 
 ## 配置
 
+### 前端配置
+
 该应用需要配置外部AI API（如Google Gemini API或OpenAI API）才能正常工作。在使用前，点击右上角的"API设置"按钮，配置以下信息：
 
 - API端点
 - 模型名称
 - API密钥
+
+### 环境变量配置
+
+除了前端配置外，你还可以通过环境变量来配置API设置。这对于部署环境特别有用，可以避免将敏感信息暴露给用户。
+
+1. 复制项目根目录下的`.env.example`文件为`.env.local`
+2. 在`.env.local`文件中填入你的配置：
+
+```
+# API端点配置
+NEXT_PUBLIC_API_ENDPOINT=https://api.example.com/v1/chat/completions
+
+# API模型配置
+NEXT_PUBLIC_API_MODEL=gemini-2.0-pro-exp-search
+
+# API密钥配置
+NEXT_PUBLIC_API_KEY=your_api_key_here
+
+# 是否允许用户在前端配置API设置
+# 设置为"false"将禁止用户在前端修改API设置
+# 设置为"true"或不设置将允许用户在前端修改API设置
+NEXT_PUBLIC_ALLOW_USER_CONFIG=true
+```
+
+**注意事项：**
+
+- 环境变量配置的优先级高于前端用户配置
+- 当`NEXT_PUBLIC_ALLOW_USER_CONFIG`设置为`false`时，用户将无法在前端修改API设置
+- 当未设置环境变量时，将使用前端用户配置的设置
