@@ -30,6 +30,12 @@ export function ApiSettings({ open, onOpenChange }: ApiSettingsProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 确保组件已挂载（客户端渲染）
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Update local state when apiConfig changes or dialog opens
   useEffect(() => {
@@ -101,9 +107,30 @@ export function ApiSettings({ open, onOpenChange }: ApiSettingsProps) {
 
   // 重置密码验证状态
   const handleResetPasswordValidation = () => {
-    setPasswordValidated(false);
-    setPassword('');
+    if (isMounted) {
+      setPasswordValidated(false);
+      setPassword('');
+    }
   };
+
+  // 如果组件未挂载（服务器端渲染），返回基本对话框
+  if (!isMounted) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md backdrop-blur-lg bg-background/90 border border-border/30 rounded-xl shadow-lg">
+          <DialogHeader>
+            <DialogTitle>API 设置</DialogTitle>
+            <DialogDescription>
+              加载中...
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p>正在加载设置界面，请稍候...</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

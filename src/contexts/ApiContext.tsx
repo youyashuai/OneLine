@@ -24,6 +24,7 @@ const defaultApiConfig: ApiConfig = {
   accessPassword: '',
 };
 
+// 创建默认上下文值，避免服务器端渲染问题
 const ApiContext = createContext<ApiContextType>({
   apiConfig: defaultApiConfig,
   updateApiConfig: () => {},
@@ -63,8 +64,8 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
       // 如果没有设置访问密码，则认为已通过验证
       if (!envAccessPassword) {
         setIsPasswordValidated(true);
-      } else {
-        // 检查localStorage中是否有已验证的标记
+      } else if (typeof window !== 'undefined') {
+        // 只在客户端检查localStorage
         const passwordValidated = localStorage.getItem('oneLine_passwordValidated');
         setIsPasswordValidated(passwordValidated === 'true');
       }
@@ -80,19 +81,24 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
       if (envAccessPassword) initialConfig.accessPassword = envAccessPassword;
 
       // 如果允许用户配置，尝试从localStorage加载
-      if (userConfigAllowed) {
+      if (userConfigAllowed && typeof window !== 'undefined') {
+        // 只在客户端访问localStorage
         const storedConfig = localStorage.getItem('oneLine_apiConfig');
         if (storedConfig) {
-          const parsedConfig = JSON.parse(storedConfig);
-          
-          // 合并配置，环境变量优先级高于localStorage
-          initialConfig = {
-            endpoint: envEndpoint || parsedConfig.endpoint || '',
-            model: envModel || parsedConfig.model || defaultApiConfig.model,
-            apiKey: envApiKey || parsedConfig.apiKey || '',
-            allowUserConfig: userConfigAllowed,
-            accessPassword: envAccessPassword || '',
-          };
+          try {
+            const parsedConfig = JSON.parse(storedConfig);
+            
+            // 合并配置，环境变量优先级高于localStorage
+            initialConfig = {
+              endpoint: envEndpoint || parsedConfig.endpoint || '',
+              model: envModel || parsedConfig.model || defaultApiConfig.model,
+              apiKey: envApiKey || parsedConfig.apiKey || '',
+              allowUserConfig: userConfigAllowed,
+              accessPassword: envAccessPassword || '',
+            };
+          } catch (e) {
+            console.error('Failed to parse stored config:', e);
+          }
         }
       }
 
@@ -111,8 +117,10 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
     setApiConfig(prev => {
       const newConfig = { ...prev, ...config };
       
-      // 保存到localStorage
-      localStorage.setItem('oneLine_apiConfig', JSON.stringify(newConfig));
+      // 只在客户端保存到localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('oneLine_apiConfig', JSON.stringify(newConfig));
+      }
       
       // 更新isConfigured状态
       setIsConfigured(!!newConfig.endpoint && !!newConfig.apiKey);
@@ -127,9 +135,25 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
     const isValid = password === apiConfig.accessPassword;
     if (isValid) {
       setIsPasswordValidated(true);
-      localStorage.setItem('oneLine_passwordValidated', 'true');
+      // 只在客户端保存到localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('oneLine_passwordValidated', 'true');
+      }
     }
     return isValid;
+  };
+
+  // 安全地设置密码验证状态的函数
+  const setPasswordValidatedSafe = (validated: boolean) => {
+    setIsPasswordValidated(validated);
+    // 只在客户端保存到localStorage
+    if (typeof window !== 'undefined') {
+      if (validated) {
+        localStorage.setItem('oneLine_passwordValidated', 'true');
+      } else {
+        localStorage.removeItem('oneLine_passwordValidated');
+      }
+    }
   };
 
   return (
@@ -141,7 +165,7 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
       isPasswordProtected,
       validatePassword,
       isPasswordValidated,
-      setPasswordValidated
+      setPasswordValidated: setPasswordValidatedSafe
     }}>
       {children}
     </ApiContext.Provider>
