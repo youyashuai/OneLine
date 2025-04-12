@@ -67,10 +67,16 @@ NEXT_PUBLIC_API_KEY=your_api_key_here
 # 设置为"false"将禁止用户在前端修改API设置
 # 设置为"true"或不设置将允许用户在前端修改API设置
 NEXT_PUBLIC_ALLOW_USER_CONFIG=true
+
+# 访问密码配置
+# 设置后，用户需要输入正确的密码才能访问API设置
+# 这可以避免API被滥用，增强应用安全性
+NEXT_PUBLIC_ACCESS_PASSWORD=your_access_password_here
 ```
 
 **注意事项：**
 
 - 环境变量配置的优先级高于前端用户配置
 - 当`NEXT_PUBLIC_ALLOW_USER_CONFIG`设置为`false`时，用户将无法在前端修改API设置
+- 当设置了`NEXT_PUBLIC_ACCESS_PASSWORD`时，用户需要输入正确的密码才能访问API设置
 - 当未设置环境变量时，将使用前端用户配置的设置
