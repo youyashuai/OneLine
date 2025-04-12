@@ -1,0 +1,9 @@
+[build]
+  command = "bun run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[images]
+  remote_images = ["https://same-assets.com/*"]
