@@ -6,24 +6,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
 
 interface ApiSettingsProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-// 预定义的模型选项
-const MODEL_OPTIONS = [
-  { value: 'gemini-2.0-flash-exp-search', label: 'Gemini 2.0 Flash' },
-  { value: 'gemini-2.0-pro-exp-search', label: 'Gemini 2.0 Pro' },
-  { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
-  { value: 'gpt-4', label: 'GPT-4' },
-  { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
-  { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus' },
-  { value: 'claude-3-sonnet-20240229', label: 'Claude 3 Sonnet' },
-  { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku' },
-];
 
 export function ApiSettings({ open, onOpenChange }: ApiSettingsProps) {
   const { apiConfig, updateApiConfig, isConfigured, allowUserConfig } = useApi();
@@ -31,26 +18,13 @@ export function ApiSettings({ open, onOpenChange }: ApiSettingsProps) {
   const [model, setModel] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [error, setError] = useState('');
-  const [customModel, setCustomModel] = useState('');
-  const [isCustomModel, setIsCustomModel] = useState(false);
 
   // Update local state when apiConfig changes or dialog opens
   useEffect(() => {
     if (open) {
       setEndpoint(apiConfig.endpoint);
+      setModel(apiConfig.model);
       setApiKey(apiConfig.apiKey);
-      
-      // 检查当前模型是否在预定义选项中
-      const modelOption = MODEL_OPTIONS.find(option => option.value === apiConfig.model);
-      if (modelOption) {
-        setModel(apiConfig.model);
-        setIsCustomModel(false);
-        setCustomModel('');
-      } else {
-        setModel('custom');
-        setIsCustomModel(true);
-        setCustomModel(apiConfig.model);
-      }
     }
   }, [apiConfig, open]);
 
@@ -72,14 +46,9 @@ export function ApiSettings({ open, onOpenChange }: ApiSettingsProps) {
       return;
     }
 
-    // 验证模型选择
-    let finalModel = model;
-    if (isCustomModel) {
-      if (!customModel.trim()) {
-        setError('模型名称不能为空');
-        return;
-      }
-      finalModel = customModel.trim();
+    if (!model.trim()) {
+      setError('模型名称不能为空');
+      return;
     }
 
     if (!apiKey.trim()) {
@@ -93,18 +62,12 @@ export function ApiSettings({ open, onOpenChange }: ApiSettingsProps) {
     // Update API config
     updateApiConfig({
       endpoint: endpoint.trim(),
-      model: finalModel,
+      model: model.trim(),
       apiKey: apiKey.trim()
     });
 
     // Close dialog
     onOpenChange(false);
-  };
-
-  // 处理模型选择变化
-  const handleModelChange = (value: string) => {
-    setModel(value);
-    setIsCustomModel(value === 'custom');
   };
 
   return (
@@ -140,33 +103,16 @@ export function ApiSettings({ open, onOpenChange }: ApiSettingsProps) {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
                 <Label htmlFor="model" className="sm:text-right">
-                  模型选择
+                  模型名称
                 </Label>
-                <div className="sm:col-span-3">
-                  <Select
-                    id="model"
-                    value={model}
-                    onValueChange={handleModelChange}
-                    disabled={!allowUserConfig}
-                  >
-                    {MODEL_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                    <option value="custom">自定义模型</option>
-                  </Select>
-                  
-                  {isCustomModel && (
-                    <Input
-                      className="mt-2 rounded-lg"
-                      placeholder="输入自定义模型名称"
-                      value={customModel}
-                      onChange={(e) => setCustomModel(e.target.value)}
-                      disabled={!allowUserConfig}
-                    />
-                  )}
-                </div>
+                <Input
+                  id="model"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  placeholder="例如: gemini-2.0-pro-exp-search"
+                  className="sm:col-span-3 rounded-lg"
+                  disabled={!allowUserConfig}
+                />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
                 <Label htmlFor="api-key" className="sm:text-right">
