@@ -24,7 +24,7 @@ function MainContent() {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [timelineData, setTimelineData] = useState<TimelineData>({ events: [] });
-  // 只在环境变量和浏览器都没有设置时才弹出API配置页面
+  // 不再自动弹出API设置页面，只在用户实际使用时才显示
   const [showSettings, setShowSettings] = useState(false);
   const [error, setError] = useState('');
   const [showFloatingButton, setShowFloatingButton] = useState(false);
@@ -34,15 +34,7 @@ function MainContent() {
   const [endDate, setEndDate] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc'); // 'asc' for oldest first, 'desc' for newest first
 
-  // 初始化时检查是否需要显示设置页面
-  useEffect(() => {
-    // 只有在以下情况才自动弹出API设置页面：
-    // 1. API未配置（环境变量和localStorage都没有设置）
-    // 2. 如果有密码保护，则需要已验证密码
-    if (!isConfigured && (!isPasswordProtected || isPasswordValidated)) {
-      setShowSettings(true);
-    }
-  }, [isConfigured, isPasswordProtected, isPasswordValidated]);
+  // 移除自动弹出API设置页面的useEffect
 
   // Effect to show/hide the floating button when scrolling
   useEffect(() => {
