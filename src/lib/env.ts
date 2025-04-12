@@ -7,6 +7,7 @@ export function getEnvConfig(): EnvConfig {
     NEXT_PUBLIC_API_MODEL: process.env.NEXT_PUBLIC_API_MODEL,
     NEXT_PUBLIC_API_KEY: process.env.NEXT_PUBLIC_API_KEY,
     NEXT_PUBLIC_ALLOW_USER_CONFIG: process.env.NEXT_PUBLIC_ALLOW_USER_CONFIG,
+    NEXT_PUBLIC_ACCESS_PASSWORD: process.env.NEXT_PUBLIC_ACCESS_PASSWORD,
   };
 }
 
@@ -30,4 +31,21 @@ export function getEnvApiModel(): string | undefined {
 // 获取环境变量中的API密钥
 export function getEnvApiKey(): string | undefined {
   return process.env.NEXT_PUBLIC_API_KEY;
+}
+
+// 获取环境变量中的访问密码
+export function getEnvAccessPassword(): string | undefined {
+  return process.env.NEXT_PUBLIC_ACCESS_PASSWORD;
+}
+
+// 检查是否设置了访问密码
+export function hasAccessPassword(): boolean {
+  return !!process.env.NEXT_PUBLIC_ACCESS_PASSWORD;
+}
+
+// 验证访问密码是否正确
+export function validateAccessPassword(password: string): boolean {
+  const envPassword = process.env.NEXT_PUBLIC_ACCESS_PASSWORD;
+  if (!envPassword) return true; // 如果未设置密码，则任何密码都有效
+  return password === envPassword;
 }

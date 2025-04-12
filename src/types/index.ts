@@ -3,6 +3,7 @@ export interface ApiConfig {
   model: string;
   apiKey: string;
   allowUserConfig?: boolean; // 是否允许用户在前端配置API设置
+  accessPassword?: string; // 访问密码
 }
 
 export interface TimelineEvent {
@@ -41,4 +42,5 @@ export interface EnvConfig {
   NEXT_PUBLIC_API_MODEL?: string;
   NEXT_PUBLIC_API_KEY?: string;
   NEXT_PUBLIC_ALLOW_USER_CONFIG?: string;
+  NEXT_PUBLIC_ACCESS_PASSWORD?: string; // 访问密码环境变量
 }

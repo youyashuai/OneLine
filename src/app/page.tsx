@@ -20,11 +20,12 @@ import { toast } from 'sonner';
 import { Settings, SortDesc, SortAsc, Download } from 'lucide-react';
 
 function MainContent() {
-  const { apiConfig, isConfigured } = useApi();
+  const { apiConfig, isConfigured, isPasswordProtected, isPasswordValidated } = useApi();
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [timelineData, setTimelineData] = useState<TimelineData>({ events: [] });
-  const [showSettings, setShowSettings] = useState(!isConfigured);
+  // 只在环境变量和浏览器都没有设置时才弹出API配置页面
+  const [showSettings, setShowSettings] = useState(false);
   const [error, setError] = useState('');
   const [showFloatingButton, setShowFloatingButton] = useState(false);
   const [dateFilter, setDateFilter] = useState<DateFilterConfig>({ option: 'all' });
@@ -32,6 +33,16 @@ function MainContent() {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc'); // 'asc' for oldest first, 'desc' for newest first
+
+  // 初始化时检查是否需要显示设置页面
+  useEffect(() => {
+    // 只有在以下情况才自动弹出API设置页面：
+    // 1. API未配置（环境变量和localStorage都没有设置）
+    // 2. 如果有密码保护，则需要已验证密码
+    if (!isConfigured && (!isPasswordProtected || isPasswordValidated)) {
+      setShowSettings(true);
+    }
+  }, [isConfigured, isPasswordProtected, isPasswordValidated]);
 
   // Effect to show/hide the floating button when scrolling
   useEffect(() => {
@@ -140,8 +151,16 @@ function MainContent() {
       return;
     }
 
+    // 检查API是否已配置，以及是否已通过密码验证（如果需要）
     if (!isConfigured) {
       toast.info('请先配置API设置');
+      setShowSettings(true);
+      return;
+    }
+
+    // 如果有密码保护但未验证，提示需要验证密码
+    if (isPasswordProtected && !isPasswordValidated) {
+      toast.info('请先验证访问密码');
       setShowSettings(true);
       return;
     }
@@ -238,10 +257,18 @@ function MainContent() {
   };
 
   const handleRequestDetails = async (event: TimelineEvent): Promise<string> => {
+    // 检查API是否已配置，以及是否已通过密码验证（如果需要）
     if (!isConfigured) {
       toast.info('请先配置API设置');
       setShowSettings(true);
       return '请先配置API设置';
+    }
+
+    // 如果有密码保护但未验证，提示需要验证密码
+    if (isPasswordProtected && !isPasswordValidated) {
+      toast.info('请先验证访问密码');
+      setShowSettings(true);
+      return '请先验证访问密码';
     }
 
     try {
