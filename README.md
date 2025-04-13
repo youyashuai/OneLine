@@ -19,21 +19,10 @@
 - Tailwind CSS
 - shadcn/ui 组件库
 
-## 开发
-
-```bash
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
+## Docker部署
+感谢 [@justincnn](https://github.com/justincnn) 佬构建的镜像
 ```
-
-## 构建
-
-```bash
-# 构建生产版本
-npm run build
+docker pull justincnn/oneline
 ```
 
 ## 配置
@@ -80,3 +69,6 @@ NEXT_PUBLIC_ACCESS_PASSWORD=your_access_password_here
 - 当`NEXT_PUBLIC_ALLOW_USER_CONFIG`设置为`false`时，用户将无法在前端修改API设置
 - 当设置了`NEXT_PUBLIC_ACCESS_PASSWORD`时，用户需要输入正确的密码才能访问API设置
 - 当未设置环境变量时，将使用前端用户配置的设置
+
+## 友情项目
+- [@snailyp](https://github.com/snailyp)大佬的[gemini轮询代理服务](https://github.com/snailyp/gemini-balance) 本项目的Demo站后端API服务也是使用大佬的项目，太强了🤗
